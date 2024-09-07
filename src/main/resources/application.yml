@@ -1,0 +1,18 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db-changelog-master.xml
+  application:
+    name: Shop
+  datasource:
+    url: jdbc:postgresql://172.17.0.2/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8080
