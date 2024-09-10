@@ -5,7 +5,7 @@ spring:
   application:
     name: Shop
   datasource:
-    url: jdbc:postgresql://172.17.0.2/${DB_NAME}
+    url: jdbc:postgresql://${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -13,6 +13,19 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+  aop:
+    auto: true
 
 server:
   port: 8080
+
+
+app:
+  scheduling:
+    enabled: true
+    period: 10000
+    priceIncreasePercentage: 1.25
+    optimization:
+      enabled: true
+      exclusive-lock: true
+
