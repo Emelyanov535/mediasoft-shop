@@ -40,9 +40,6 @@ public class SimpleScheduler {
                 }
         );
 
-        long start = System.currentTimeMillis();
         productRepository.saveAll(productList);
-        long executionTime = System.currentTimeMillis() - start;
-        System.out.println("SaveAll executed in " + executionTime + "ms");
     }
 }

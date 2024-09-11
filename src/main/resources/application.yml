@@ -22,10 +22,11 @@ server:
 
 app:
   scheduling:
+    mode: none
     enabled: true
     period: 10000
     priceIncreasePercentage: 1.25
     optimization:
       enabled: true
-      exclusive-lock: true
+      exclusiveLock: true
 

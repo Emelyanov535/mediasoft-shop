@@ -1,22 +1,22 @@
 package ru.mediasoft.shop.sheduler;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import ru.mediasoft.shop.annotation.TimeMeter;
+import ru.mediasoft.shop.configuration.properties.SchedulerConfig;
 
+import javax.sql.DataSource;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.UUID;
 
 @Configuration
@@ -25,51 +25,37 @@ import java.util.UUID;
 @Profile("!local")
 @ConditionalOnProperty(name = {"app.scheduling.enabled", "app.scheduling.optimization.enabled"}, havingValue = "true")
 public class OptimizeScheduler {
-    @Value("${app.scheduling.priceIncreasePercentage}")
-    private Double priceIncreasePercentage;
 
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.username}")
-    private String username;
-
-    @Value("${spring.datasource.password}")
-    private String password;
-
-    @Value("${app.scheduling.optimization.exclusive-lock}")
-    private boolean exclusiveLock;
+    private final DataSource dataSource;
+    private final SchedulerConfig schedulerConfig;
+    private static final String SELECT_SQL = "SELECT * FROM t_product FOR UPDATE";
+    private static final String UPDATE_SQL = "UPDATE t_product SET price = ? WHERE id = ?";
 
     @TimeMeter
-    @Scheduled(fixedDelayString = "${app.scheduling.period}")
-    public void scheduleProductPrice() throws SQLException {
-        final String selectSql = "SELECT id, price FROM t_product";
-        final String updateSql = "UPDATE t_product SET price = ? WHERE id = ?";
-
+    @Scheduled(fixedDelayString = "#{@schedulerConfig.getPeriod()}")
+    public void scheduleProductPrice() {
         final int batchSize = 10000;
 
         try (
                 Connection connection = getNewConnection();
-                PreparedStatement selectStatement = connection.prepareStatement(selectSql,
-                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-                PreparedStatement updateStatement = connection.prepareStatement(updateSql);
+                PreparedStatement updateStatement = connection.prepareStatement(UPDATE_SQL);
                 FileWriter fileWriter = new FileWriter("data.txt")
         ) {
             connection.setAutoCommit(false);
 
-            if (exclusiveLock) {
-                try (PreparedStatement lockStatement = connection.prepareStatement("LOCK TABLE t_product IN EXCLUSIVE MODE")) {
-                    lockStatement.execute();
-                }
+            if (schedulerConfig.isExclusiveLock()) {
+                connection.createStatement().executeQuery("LOCK TABLE t_product IN EXCLUSIVE MODE");
             }
 
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
+            Statement selectStatement = connection.createStatement();
+
+            try (ResultSet resultSet = selectStatement.executeQuery(SELECT_SQL)) {
                 int updatedRecords = 0;
                 while (resultSet.next()) {
                     UUID id = UUID.fromString(resultSet.getString("id"));
                     BigDecimal price = resultSet.getBigDecimal("price");
 
-                    BigDecimal newPrice = price.multiply(BigDecimal.valueOf(priceIncreasePercentage));
+                    BigDecimal newPrice = price.multiply(BigDecimal.valueOf(schedulerConfig.getPriceIncreasePercentage()));
                     updateStatement.setBigDecimal(1, newPrice);
                     updateStatement.setObject(2, id);
                     updateStatement.addBatch();
@@ -82,16 +68,16 @@ public class OptimizeScheduler {
                     fileWriter.write(id + " " + newPrice + "\n");
                 }
                 connection.commit();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 connection.rollback();
                 throw new RuntimeException(e);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private Connection getNewConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return dataSource.getConnection();
     }
 }
