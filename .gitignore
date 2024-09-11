@@ -37,3 +37,5 @@ out/
 .vscode/
 /data/testdb.mv.db
 /data/testdb.trace.db
+/data.txt
+/results.txt
