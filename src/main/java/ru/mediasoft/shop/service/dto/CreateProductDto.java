@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
-import ru.mediasoft.shop.persistence.entity.CategoryType;
+import ru.mediasoft.shop.enumeration.CategoryType;
 
 import java.math.BigDecimal;
 

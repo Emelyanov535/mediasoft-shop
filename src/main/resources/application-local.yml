@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    enabled: true
+    enabled: false
   application:
     name: Shop
   datasource:

@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.mediasoft.shop.persistence.entity.CategoryType;
+import ru.mediasoft.shop.enumeration.CategoryType;
 
 import java.math.BigDecimal;
 

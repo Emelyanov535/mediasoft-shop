@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 import ru.mediasoft.shop.exception.ProductArticleAlreadyExistsException;
 import ru.mediasoft.shop.exception.ProductNotFoundException;
-import ru.mediasoft.shop.persistence.entity.CategoryType;
+import ru.mediasoft.shop.enumeration.CategoryType;
 import ru.mediasoft.shop.persistence.entity.ProductEntity;
 import ru.mediasoft.shop.persistence.repository.ProductRepository;
 import ru.mediasoft.shop.service.dto.CreateProductDto;

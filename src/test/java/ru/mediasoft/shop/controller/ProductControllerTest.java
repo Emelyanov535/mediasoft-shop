@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.mediasoft.shop.controller.dto.UpdateProductRequest;
 import ru.mediasoft.shop.exception.ProductNotFoundException;
-import ru.mediasoft.shop.persistence.entity.CategoryType;
+import ru.mediasoft.shop.enumeration.CategoryType;
 import ru.mediasoft.shop.service.ProductService;
 import ru.mediasoft.shop.service.dto.ProductDto;
 import ru.mediasoft.shop.service.dto.UpdateProductDto;

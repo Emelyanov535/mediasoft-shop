@@ -13,6 +13,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+    show-sql: true
   aop:
     auto: true
 
@@ -23,10 +24,10 @@ server:
 app:
   scheduling:
     mode: none
-    enabled: true
+    enabled: false
     period: 10000
     priceIncreasePercentage: 1.25
     optimization:
-      enabled: true
-      exclusiveLock: true
+      enabled: false
+      exclusiveLock: false
 

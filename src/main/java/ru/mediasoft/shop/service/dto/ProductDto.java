@@ -3,7 +3,7 @@ package ru.mediasoft.shop.service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
-import ru.mediasoft.shop.persistence.entity.CategoryType;
+import ru.mediasoft.shop.enumeration.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

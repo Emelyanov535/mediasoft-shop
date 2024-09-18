@@ -1,4 +1,4 @@
-package ru.mediasoft.shop.persistence.entity;
+package ru.mediasoft.shop.enumeration;
 
 public enum CategoryType {
     ELECTRONICS,

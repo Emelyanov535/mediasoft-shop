@@ -37,17 +37,7 @@ public class ProductService {
     public Page<ProductDto> findAll(Pageable pageable) {
         return productRepository
                 .findAll(pageable)
-                .map(product -> new ProductDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getArticle(),
-                        product.getDescription(),
-                        product.getCategory(),
-                        product.getPrice(),
-                        product.getAmount(),
-                        product.getChangedAmount(),
-                        product.getCreatedAt()
-                ));
+                .map(product -> conversionService.convert(product, ProductDto.class));
     }
 
     @Transactional
