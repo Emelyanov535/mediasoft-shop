@@ -6,8 +6,8 @@ import jakarta.persistence.criteria.Root;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import ru.mediasoft.shop.controller.dto.CriteriaData;
-import ru.mediasoft.shop.enumeration.OperationEnum;
 import ru.mediasoft.shop.enumeration.CategoryType;
+import ru.mediasoft.shop.enumeration.OperationEnum;
 
 public class CriteriaDataCategory extends CriteriaData<CategoryType> {
     public CriteriaDataCategory(@NotBlank(message = "Field cannot be blank") String field,

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 import ru.mediasoft.shop.service.CurrencyService;
 import ru.mediasoft.shop.service.dto.ExchangeRateDto;
 
@@ -16,7 +15,7 @@ public class TestController {
     private final CurrencyService currencyService;
 
     @GetMapping("/exchange-rates")
-    public Mono<ExchangeRateDto> getExchangeRates() {
+    public ExchangeRateDto getExchangeRates() {
         return currencyService.getCurrentCurrency();
     }
 }

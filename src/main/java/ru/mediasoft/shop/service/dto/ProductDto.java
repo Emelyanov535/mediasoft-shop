@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 import ru.mediasoft.shop.enumeration.CategoryType;
 
 import java.math.BigDecimal;

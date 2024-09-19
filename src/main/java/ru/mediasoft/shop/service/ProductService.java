@@ -44,7 +44,7 @@ public class ProductService {
 
         ProductDto productDto = conversionService.convert(productEntity, ProductDto.class);
 
-        ExchangeRateDto exchangeRateDto = currencyService.getCurrentCurrency().block();
+        ExchangeRateDto exchangeRateDto = currencyService.getCurrentCurrency();
         BigDecimal convertedPrice = currencyService.convertPrice(productDto.getPrice(), currency, exchangeRateDto);
 
         productDto.setCurrency(currency);

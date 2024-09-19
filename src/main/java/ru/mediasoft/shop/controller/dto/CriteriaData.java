@@ -10,11 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.mediasoft.shop.enumeration.OperationEnum;
-import ru.mediasoft.shop.service.criteriaDataType.CriteriaDataBigDecimal;
-import ru.mediasoft.shop.service.criteriaDataType.CriteriaDataCategory;
-import ru.mediasoft.shop.service.criteriaDataType.CriteriaDataInteger;
-import ru.mediasoft.shop.service.criteriaDataType.CriteriaDataLocalDate;
-import ru.mediasoft.shop.service.criteriaDataType.CriteriaDataString;
+import ru.mediasoft.shop.service.criteriaDataType.*;
 
 @Data
 @JsonTypeInfo(
