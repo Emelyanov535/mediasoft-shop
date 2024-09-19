@@ -11,9 +11,11 @@ import ru.mediasoft.shop.exception.ProductNotFoundException;
 import ru.mediasoft.shop.persistence.entity.ProductEntity;
 import ru.mediasoft.shop.persistence.repository.ProductRepository;
 import ru.mediasoft.shop.service.dto.CreateProductDto;
+import ru.mediasoft.shop.service.dto.ExchangeRateDto;
 import ru.mediasoft.shop.service.dto.ProductDto;
 import ru.mediasoft.shop.service.dto.UpdateProductDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
+    private final CurrencyService currencyService;
 
     @Transactional(readOnly = true)
     public ProductDto findProductById(UUID id){
@@ -31,6 +34,23 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
         return conversionService.convert(productEntity, ProductDto.class);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDto findProductByIdCurrency(UUID id, String currency){
+        final ProductEntity productEntity = productRepository
+                .findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        ProductDto productDto = conversionService.convert(productEntity, ProductDto.class);
+
+        ExchangeRateDto exchangeRateDto = currencyService.getCurrentCurrency().block();
+        BigDecimal convertedPrice = currencyService.convertPrice(productDto.getPrice(), currency, exchangeRateDto);
+
+        productDto.setCurrency(currency);
+        productDto.setPrice(convertedPrice);
+
+        return productDto;
     }
 
     @Transactional(readOnly = true)

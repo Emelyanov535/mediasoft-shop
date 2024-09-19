@@ -2,6 +2,8 @@ package ru.mediasoft.shop.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Value;
 import ru.mediasoft.shop.enumeration.CategoryType;
 
@@ -12,15 +14,17 @@ import java.util.UUID;
 
 @Builder
 @AllArgsConstructor
-@Value
+@Setter
+@Getter
 public class ProductDto {
-    UUID id;
-    String name;
-    Long article;
-    String description;
-    CategoryType category;
-    BigDecimal price;
-    int amount;
-    LocalDateTime changedAmount;
-    LocalDate createdAt;
+    private UUID id;
+    private String name;
+    private Long article;
+    private String description;
+    private CategoryType category;
+    private BigDecimal price;
+    private int amount;
+    private LocalDateTime changedAmount;
+    private LocalDate createdAt;
+    private String currency;
 }
