@@ -1,6 +1,7 @@
 package ru.mediasoft.shop.configuration;
 
 import com.google.common.cache.CacheBuilder;
+import lombok.NonNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -24,7 +25,7 @@ public class WebConfig {
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager() {
             @Override
-            protected Cache createConcurrentMapCache(String name) {
+            protected @NonNull Cache createConcurrentMapCache(@NonNull String name) {
                 return new ConcurrentMapCache(
                         name,
                         CacheBuilder.newBuilder()
