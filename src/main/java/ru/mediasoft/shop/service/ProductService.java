@@ -6,12 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.mediasoft.shop.configuration.provider.CurrencySessionBean;
 import ru.mediasoft.shop.exception.ProductArticleAlreadyExistsException;
 import ru.mediasoft.shop.exception.ProductNotFoundException;
 import ru.mediasoft.shop.persistence.entity.ProductEntity;
 import ru.mediasoft.shop.persistence.repository.ProductRepository;
 import ru.mediasoft.shop.service.dto.CreateProductDto;
-import ru.mediasoft.shop.service.dto.ExchangeRateDto;
 import ru.mediasoft.shop.service.dto.ProductDto;
 import ru.mediasoft.shop.service.dto.UpdateProductDto;
 
@@ -25,7 +25,8 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
-    private final CurrencyService currencyService;
+    private final ExchangeRateProvider exchangeRateProvider;
+    private final CurrencySessionBean currencySessionBean;
 
     @Transactional(readOnly = true)
     public ProductDto findProductById(UUID id){
@@ -37,15 +38,15 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductDto findProductByIdCurrency(UUID id, String currency){
+    public ProductDto findProductByIdCurrency(UUID id){
         final ProductEntity productEntity = productRepository
                 .findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
         ProductDto productDto = conversionService.convert(productEntity, ProductDto.class);
 
-        ExchangeRateDto exchangeRateDto = currencyService.getCurrentCurrency();
-        BigDecimal convertedPrice = currencyService.convertPrice(productDto.getPrice(), currency, exchangeRateDto);
+        String currency = currencySessionBean.getCurrency();
+        BigDecimal convertedPrice = exchangeRateProvider.convertPrice(productDto.getPrice(), currency);
 
         productDto.setCurrency(currency);
         productDto.setPrice(convertedPrice);

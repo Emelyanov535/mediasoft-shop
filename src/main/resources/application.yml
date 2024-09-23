@@ -29,9 +29,10 @@ app:
       enabled: false
       exclusiveLock: false
 
-currency-service:
-  host: http://localhost:8081 #хост второго сервиса
-  methods:
-    get-exchange-rates: /api/v1/exchange-rates
-  mock: false
+rest:
+  currency:
+    host: http://localhost:8081 #хост второго сервиса
+    methods:
+      get-exchange-rates: /api/v1/exchange-rates
+    mock: false
 

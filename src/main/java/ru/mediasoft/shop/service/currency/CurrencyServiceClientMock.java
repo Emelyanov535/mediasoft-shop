@@ -7,7 +7,7 @@ import ru.mediasoft.shop.service.dto.ExchangeRateDto;
 import java.math.BigDecimal;
 
 @Service
-@ConditionalOnProperty(name = "currency-service.mock", havingValue = "true")
+@ConditionalOnProperty(name = "rest.currency.mock", havingValue = "true")
 public class CurrencyServiceClientMock implements CurrencyServiceClient {
     @Override
     public ExchangeRateDto getExchangeRates() {

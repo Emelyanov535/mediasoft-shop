@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,12 +25,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static ru.mediasoft.shop.enumeration.OperationEnum.EQUAL;
-import static ru.mediasoft.shop.enumeration.OperationEnum.GRATER_THAN_OR_EQ;
-import static ru.mediasoft.shop.enumeration.OperationEnum.LIKE;
+import static ru.mediasoft.shop.enumeration.OperationEnum.*;
 
 @DataJpaTest
 @ActiveProfiles("local")
@@ -114,13 +112,19 @@ public class SearchServiceTest {
 
         List<CriteriaData<?>> criteriaList = List.of(criteriaName, criteriaCategory, criteriaPrice);
 
-        Page<ProductDto> result = searchService.hardSearch(pageable, criteriaList);
+        List<ProductDto> result = searchService.hardSearch(pageable, criteriaList).getContent();
 
-        assertThat(result.getContent()).hasSize(2);
-        assertThat(result.getContent().get(0).getName()).isEqualTo("Product2");
-        assertThat(result.getContent().get(1).getName()).isEqualTo("Product3");
-
-        assertThat(result.getContent().get(0).getCategory()).isEqualTo(CategoryType.FOOD);
-        assertThat(result.getContent().get(1).getPrice()).isGreaterThan(BigDecimal.valueOf(100));
+        assertThat(result)
+                .anySatisfy(productDto -> {
+                    assertEquals("Product2", productDto.getName());
+                    assertEquals(CategoryType.FOOD, productDto.getCategory());
+                    assertThat(productDto.getPrice()).isGreaterThan(BigDecimal.valueOf(100));
+                })
+                .anySatisfy(productDto -> {
+                    assertEquals("Product3", productDto.getName());
+                    assertEquals(CategoryType.FOOD, productDto.getCategory());
+                    assertThat(productDto.getPrice()).isGreaterThan(BigDecimal.valueOf(300));
+                })
+                .hasSize(2);
     }
 }

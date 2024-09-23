@@ -1,7 +1,6 @@
 package ru.mediasoft.shop.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.mediasoft.shop.configuration.provider.CurrencySessionBean;
 import ru.mediasoft.shop.controller.dto.ProductRequest;
 import ru.mediasoft.shop.controller.dto.UpdateProductRequest;
 import ru.mediasoft.shop.service.ProductService;
@@ -31,7 +29,6 @@ import java.util.UUID;
 public class ProductController {
     private final ProductService productService;
     private final ConversionService conversionService;
-    private final CurrencySessionBean currencySessionBean;
 
     /**
      * Получение продукта по его уникальному идентификатору.
@@ -40,12 +37,8 @@ public class ProductController {
      * @return {@link ResponseEntity} с продуктом {@link ProductDto}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> findById(@PathVariable UUID id, HttpServletRequest request){
-        String currency = request.getHeader("currency");
-        if (currency == null || currency.isEmpty()) {
-            currency = currencySessionBean.getCurrency();  // Валюта из сессии
-        }
-        return ResponseEntity.ok(productService.findProductByIdCurrency(id,currency));
+    public ResponseEntity<ProductDto> findById(@PathVariable UUID id){
+        return ResponseEntity.ok(productService.findProductByIdCurrency(id));
     }
 
     /**
