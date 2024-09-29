@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
+import ru.mediasoft.shop.enumeration.CategoryType;
 import ru.mediasoft.shop.exception.ProductArticleAlreadyExistsException;
 import ru.mediasoft.shop.exception.ProductNotFoundException;
-import ru.mediasoft.shop.enumeration.CategoryType;
 import ru.mediasoft.shop.persistence.entity.ProductEntity;
 import ru.mediasoft.shop.persistence.repository.ProductRepository;
 import ru.mediasoft.shop.service.dto.CreateProductDto;
@@ -21,13 +21,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {

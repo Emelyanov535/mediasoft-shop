@@ -26,4 +26,5 @@ public class ProductDto {
     private LocalDateTime changedAmount;
     private LocalDate createdAt;
     private String currency;
+    private Boolean isAvailable;
 }

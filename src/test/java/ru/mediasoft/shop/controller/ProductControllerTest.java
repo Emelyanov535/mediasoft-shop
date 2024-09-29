@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.mediasoft.shop.controller.dto.UpdateProductRequest;
-import ru.mediasoft.shop.exception.ProductNotFoundException;
 import ru.mediasoft.shop.enumeration.CategoryType;
+import ru.mediasoft.shop.exception.ProductNotFoundException;
 import ru.mediasoft.shop.service.ProductService;
 import ru.mediasoft.shop.service.dto.ProductDto;
 import ru.mediasoft.shop.service.dto.UpdateProductDto;
@@ -23,12 +23,8 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
 public class ProductControllerTest {

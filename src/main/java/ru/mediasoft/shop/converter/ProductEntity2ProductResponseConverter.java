@@ -18,6 +18,7 @@ public class ProductEntity2ProductResponseConverter implements Converter<Product
                 .amount(source.getAmount())
                 .changedAmount(source.getChangedAmount())
                 .createdAt(source.getCreatedAt())
+                .isAvailable(source.getIsAvailable())
                 .build();
     }
 }

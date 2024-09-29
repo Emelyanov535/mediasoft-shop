@@ -40,7 +40,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    compileOnly 'com.google.guava:guava:28.1-jre'
+    compileOnly 'com.google.guava:guava:32.0.0-android'
 }
 
 tasks.named('test') {

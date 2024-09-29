@@ -34,4 +34,6 @@ public class ProductEntity {
     private int amount;
     private LocalDateTime changedAmount;
     private LocalDate createdAt;
+    @Column(nullable = false)
+    private Boolean isAvailable;
 }
