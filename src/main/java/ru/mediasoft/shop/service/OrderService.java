@@ -39,8 +39,6 @@ public class OrderService {
                 .customer(customer)
                 .build();
 
-        orderRepository.save(order);
-
         Map<UUID, ProductEntity> listProduct = productRepository.findAllById(
                         orderRequest.getProducts().stream()
                                 .map(OrderRequest.CompressedProduct::getId)
@@ -48,33 +46,37 @@ public class OrderService {
                 .stream()
                 .collect(Collectors.toMap(ProductEntity::getId, productEntity -> productEntity));
 
+        final List<OrderProductEntity> orderProducts = orderRequest.getProducts().stream()
+                .map(product -> {
+                    ProductEntity productEntity = listProduct.get(product.getId());
 
-        for (OrderRequest.CompressedProduct product : orderRequest.getProducts()) {
-            ProductEntity productEntity = listProduct.get(product.getId());
+                    if(productEntity == null) {
+                        throw new ProductNotFoundException(product.getId());
+                    }
 
-            if (isAvailableAndEnoughAmount(productEntity, product.getQuantity())) {
-                OrderProductEntity orderProductEntity = OrderProductEntity.builder()
-                        .key(new OrderProductKey(order, productEntity))
-                        .quantity(product.getQuantity())
-                        .price(productEntity.getPrice())
-                        .build();
+                    if(isAvailableAndEnoughAmount(productEntity, product.getQuantity())){
+                        throw new NotAvailableOrNotEnoughAmountException(productEntity.getId());
+                    }
 
-                int productAmount = productEntity.getAmount();
-                productEntity.setAmount(productAmount - product.getQuantity());
+                    int productAmount = productEntity.getAmount();
+                    productEntity.setAmount(productAmount - product.getQuantity());
 
-                orderProductRepository.save(orderProductEntity);
-                productRepository.save(productEntity);
-            } else {
-                throw new NotAvailableOrNotEnoughAmountException(productEntity.getId());
-            }
-        }
+                    return OrderProductEntity.builder()
+                            .key(new OrderProductKey(order.getId(), productEntity.getId()))
+                            .order(order)
+                            .product(productEntity)
+                            .quantity(product.getQuantity())
+                            .price(productEntity.getPrice())
+                            .build();
+                }).toList();
 
-        return order.getId();
+        order.setOrderProducts(orderProducts);
+
+        return orderRepository.save(order).getId();
     }
 
     public OrderResponse findOrderById(Long customerId, UUID id) {
-        OrderEntity order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
+        OrderEntity order = findById(id);
 
         if (checkCustomer(order, customerId)) {
             throw new NotExpectedCustomerException();
@@ -95,8 +97,7 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(UUID orderId, Long customerId) {
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        OrderEntity order = findById(orderId);
 
         if (checkCustomer(order, customerId)) {
             throw new NotExpectedCustomerException();
@@ -119,8 +120,7 @@ public class OrderService {
 
     @Transactional
     public UUID addProductToOrder(Long customerId, UUID orderId, List<OrderRequest.CompressedProduct> products) {
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        OrderEntity order = findById(orderId);
 
         if (checkCustomer(order, customerId)) {
             throw new NotExpectedCustomerException();
@@ -144,7 +144,7 @@ public class OrderService {
                 throw new ProductNotFoundException(newProduct.getId());
             }
 
-            if (!isAvailableAndEnoughAmount(productEntity, newProduct.getQuantity())) {
+            if (isAvailableAndEnoughAmount(productEntity, newProduct.getQuantity())) {
                 throw new NotAvailableOrNotEnoughAmountException(productEntity.getId());
             }
 
@@ -162,7 +162,9 @@ public class OrderService {
             } else {
                 // Продукт не найден в заказе, добавляем новый
                 OrderProductEntity orderProductEntity = OrderProductEntity.builder()
-                        .key(new OrderProductKey(order, productEntity))
+                        .key(new OrderProductKey(order.getId(), productEntity.getId()))
+                        .product(productEntity)
+                        .order(order)
                         .quantity(newProduct.getQuantity())
                         .price(productEntity.getPrice())
                         .build();
@@ -180,8 +182,7 @@ public class OrderService {
     }
 
     public UUID changeOrderStatus(Long customerId, UUID orderId, OrderStatus status) {
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        OrderEntity order = findById(orderId);
 
         if (checkCustomer(order, customerId)) {
             throw new NotExpectedCustomerException();
@@ -198,6 +199,11 @@ public class OrderService {
     }
 
     private boolean isAvailableAndEnoughAmount(ProductEntity product, Integer quantity) {
-        return product.getIsAvailable() && product.getAmount() >= quantity && quantity > 0;
+        return !product.getIsAvailable() || product.getAmount() < quantity || quantity <= 0;
+    }
+
+    private OrderEntity findById(UUID id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
     }
 }

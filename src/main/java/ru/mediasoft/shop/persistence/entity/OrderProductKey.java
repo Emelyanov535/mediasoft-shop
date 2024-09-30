@@ -2,10 +2,10 @@ package ru.mediasoft.shop.persistence.entity;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Embeddable
 @AllArgsConstructor
@@ -14,10 +14,8 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 public class OrderProductKey implements Serializable {
-    @ManyToOne
     @JoinColumn(name = "order_id")
-    private OrderEntity order;
-    @ManyToOne
+    private UUID order;
     @JoinColumn(name = "product_id")
-    private ProductEntity product;
+    private UUID product;
 }
