@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.mediasoft.shop.controller.dto.order.OrderRequest;
 import ru.mediasoft.shop.controller.dto.order.OrderResponse;
+import ru.mediasoft.shop.controller.productInOrder.CustomerInfo;
+import ru.mediasoft.shop.controller.productInOrder.OrderInfo;
 import ru.mediasoft.shop.enumeration.OrderStatus;
 import ru.mediasoft.shop.exception.NotAvailableOrNotEnoughAmountException;
 import ru.mediasoft.shop.exception.NotExpectedCustomerException;
@@ -18,6 +20,7 @@ import ru.mediasoft.shop.service.dto.CompressedProductForOrderProjection;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,7 @@ public class OrderService {
     private final OrderProductRepository orderProductRepository;
     private final CustomerService customerService;
     private final ProductRepository productRepository;
+    private final AccountDataProvider accountDataProvider;
 
     @Transactional
     public UUID createOrder(Long customerId, OrderRequest orderRequest) {
@@ -50,11 +54,11 @@ public class OrderService {
                 .map(product -> {
                     ProductEntity productEntity = listProduct.get(product.getId());
 
-                    if(productEntity == null) {
+                    if (productEntity == null) {
                         throw new ProductNotFoundException(product.getId());
                     }
 
-                    if(isAvailableAndEnoughAmount(productEntity, product.getQuantity())){
+                    if (isAvailableAndEnoughAmount(productEntity, product.getQuantity())) {
                         throw new NotAvailableOrNotEnoughAmountException(productEntity.getId());
                     }
 
@@ -205,5 +209,70 @@ public class OrderService {
     private OrderEntity findById(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(id));
+    }
+
+    @Transactional
+    public Map<UUID, List<OrderInfo>> getProductInOrderInfo(List<UUID> productIds) {
+        final List<ProductEntity> productEntityList = productRepository.findAllById(productIds);
+
+        // Собираем все customerIds
+        final List<String> customerIds = productEntityList.stream()
+                .flatMap(productEntity -> productEntity.getOrderProducts().stream())
+                .map(orderProduct -> orderProduct.getOrder().getCustomer().getId().toString())
+                .distinct()
+                .toList();
+
+        CompletableFuture<Map<String, String>> accountNumberFuture = accountDataProvider.fetchAccountNumber(customerIds);
+        CompletableFuture<Map<String, String>> crmDataFuture = accountDataProvider.fetchAccountInn(customerIds);
+
+        //Продукт - список заказов
+        final Map<UUID, List<OrderEntity>> productOrdersMap = productEntityList.stream()
+                .collect(Collectors.toMap(
+                        ProductEntity::getId,
+                        productEntity -> productEntity.getOrderProducts().stream()
+                                .map(OrderProductEntity::getOrder)
+                                .filter(order -> order.getStatus() == OrderStatus.CREATED || order.getStatus() == OrderStatus.CONFIRMED)
+                                .toList()
+                ));
+
+        return accountNumberFuture.thenCombine(crmDataFuture, (number, inn) ->
+                productOrdersMap.entrySet().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        e -> e.getValue().stream().map(
+                                                orderEntity -> convertToOrderInfo(
+                                                        orderEntity,
+                                                        number.get(orderEntity.getCustomer().getId().toString()),
+                                                        inn.get(orderEntity.getCustomer().getId().toString()),
+                                                        e.getKey()
+                                                )
+                                        ).toList()
+                                )
+                        )).join();
+    }
+
+    private OrderInfo convertToOrderInfo(OrderEntity order, String number, String inn, UUID productId) {
+        CustomerEntity customer = order.getCustomer();
+        CustomerInfo customerInfo = CustomerInfo.builder()
+                .id(customer.getId())
+                .accountNumber(number)
+                .inn(inn)
+                .email(customer.getEmail())
+                .build();
+
+        Integer quantity = order.getOrderProducts().stream()
+                .filter(orderProduct -> orderProduct.getProduct().getId().equals(productId))
+                .findFirst()
+                .map(OrderProductEntity::getQuantity)
+                .orElse(0);
+
+        return OrderInfo.builder()
+                .id(order.getId())
+                .customer(customerInfo)
+                .status(order.getStatus())
+                .deliveryAddress(order.getDeliveryAddress())
+                .quantity(quantity)
+                .build();
     }
 }

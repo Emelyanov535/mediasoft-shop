@@ -18,7 +18,7 @@ spring:
 #      hibernate:
 #        format_sql: true
 
-    open-in-view: false
+    open-in-view: true
 
   aop:
     auto: true
@@ -39,7 +39,15 @@ app:
 
 rest:
   currency:
-    host: http://localhost:8081 #хост второго сервиса
+    host: http://localhost:8081
     methods:
       get-exchange-rates: /api/v1/exchange-rates
     mock: false
+  account:
+    host: http://localhost:8081
+    methods:
+      get-account-number: /api/v1/account
+  crm:
+    host: http://localhost:8081
+    methods:
+      get-crm-inn: /api/v1/crm

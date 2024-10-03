@@ -24,7 +24,7 @@ public class OrderEntity {
     private OrderStatus status;
     @Column(nullable = false)
     private String deliveryAddress;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "customer")
     private CustomerEntity customer;
     @OneToMany(mappedBy = "key.order",

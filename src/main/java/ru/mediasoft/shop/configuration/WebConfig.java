@@ -39,10 +39,26 @@ public class WebConfig {
     }
 
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder()
-                .baseUrl(restConfig.getCurrency().getHost())
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
+
+    public WebClient getWebClientForService(String baseUrl) {
+        return webClientBuilder()
+                .baseUrl(baseUrl)
                 .build();
+    }
+
+    public WebClient getCurrencyClient() {
+        return getWebClientForService(restConfig.getCurrency().getHost());
+    }
+
+    public WebClient getAccountClient() {
+        return getWebClientForService(restConfig.getAccount().getHost());
+    }
+
+    public WebClient getCrmClient() {
+        return getWebClientForService(restConfig.getCrm().getHost());
     }
 
     @Bean
