@@ -3,7 +3,7 @@ package ru.mediasoft.shop.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.mediasoft.shop.exception.CustomerNotFoundException;
+import ru.mediasoft.demostarterexceptionhandler.exception.CustomerNotFoundException;
 import ru.mediasoft.shop.persistence.entity.CustomerEntity;
 import ru.mediasoft.shop.persistence.repository.CustomerRepository;
 

@@ -36,6 +36,8 @@ app:
     optimization:
       enabled: false
       exclusiveLock: false
+  kafka:
+    enabled: true
 
 rest:
   currency:
@@ -51,3 +53,8 @@ rest:
     host: http://localhost:8081
     methods:
       get-crm-inn: /api/v1/crm
+
+
+kafka:
+  bootstrapAddress: kafka:9092
+  groupId: group1

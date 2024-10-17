@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -41,6 +42,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     compileOnly 'com.google.guava:guava:32.0.0-android'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation 'ru.mediasoft:demo-starter-exception-handler:0.0.1'
 }
 
 tasks.named('test') {
