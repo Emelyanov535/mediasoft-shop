@@ -1,1 +1,1 @@
-# mediasoft-shop
+# shop-service
