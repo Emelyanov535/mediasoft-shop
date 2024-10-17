@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service-deployment
+  labels:
+    app: product-service-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-service-deployment
+  template:
+    metadata:
+      name: product-service-deployment
+      labels:
+        app: product-service-deployment
+    spec:
+      containers:
+        - name: product-service-deployment
+          image: artememelyanov/product-service:v1
+          ports:
+            - containerPort: 7777
+              name: app
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: product-service-configmap
+                  key: SPRING_PROFILES_ACTIVE
+      
